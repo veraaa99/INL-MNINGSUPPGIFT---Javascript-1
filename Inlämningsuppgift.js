@@ -9,6 +9,7 @@ const todoForm = document.querySelector('#todoForm');
 let todoList = document.querySelector('#todoList');
 let todoTitle;
 let removeTodoTitle;
+let isCompleted = false;
 
 const getTodos = async () => {
     const response = await fetch (url)
@@ -23,6 +24,7 @@ const getTodos = async () => {
     showTodos()
     console.log(todos)
     console.log(data)
+
     return true;
 }
 
@@ -38,12 +40,25 @@ const showTodos = () => {
         check.type = "checkbox"
         check.id = todo._id
 
+        if (todo.completed) {
+            isCompleted = true
+            check.checked = true
+            li.style.backgroundColor = 'green';
+        } else {
+            isCompleted = false
+            li.style.backgroundColor = 'red';
+        }
+
         todoList.append(li, check)
 
         check.addEventListener('change', e => {
             if (e.target.checked) {
+                isCompleted = true
+                li.style.backgroundColor = 'green';
                 finishedTodo(check);
             } else {
+                isCompleted = false
+                li.style.backgroundColor = 'red';
                 unfinishedTodo(check)
             }
         })
@@ -112,7 +127,7 @@ const createTodo = async() => {
         console.error(error.message)
     }
 
-    return true
+    return true;
 }
 
 // Ta bort todo 
@@ -132,9 +147,16 @@ removeTodoBtn.addEventListener('click', () => {
 
     todos.filter(todo => {
         if(todo.title === removeTodoTitle){
-            isTodo = true
-            removeTodo(todo)
-            return
+            if (!isCompleted) {
+                isTodo = true
+                showModule()
+                console.log('Unable to remove an unfinished Todo')
+                return
+            } else {
+                isTodo = true
+                removeTodo(todo)
+                return
+            }
         } 
         return
     })
@@ -167,20 +189,19 @@ const removeTodo = async(todo) => {
 
         delete todos[response]
         window.location.reload()
-        
-        return true
         // https://medium.com/@johnwadelinatoc/manipulating-the-dom-with-fetch-7bfddf9c526b
 
     } catch (error) {
         console.error(error.message)
     }
+
+    return true
 }
 
 // Klarmarkera todos 
 // Låt användarna klarmarkera en todo genom att skicka en PUT-förfrågan till API:et. 
 // Uppdatera stylingen på den klarmarkerade todon för att visa tydligt att den är avklarad. 
 // Möjliggör även att ändra tillbaka statusen till "ej avklarad" om det behövs.
-
 
 // Visuell indikation för klarmarkering 
 // Todos som är klarmarkerade när de hämtas från databasen ska presenteras med samma styling som ovan som indikerar deras avklarade status.
@@ -218,6 +239,8 @@ const finishedTodo = async (check) => {
     } catch (error) {
         console.error(error.message)
     }
+
+    return true;
 }
 
 const unfinishedTodo = async (check) => {
@@ -249,4 +272,6 @@ const unfinishedTodo = async (check) => {
     } catch (error) {
         console.error(error.message)
     }
+
+    return true;
 }
