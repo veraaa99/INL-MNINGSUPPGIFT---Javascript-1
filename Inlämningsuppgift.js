@@ -39,11 +39,18 @@ const showTodos = () => {
         check.id = todo._id
 
         todoList.append(li, check)
+
+        check.addEventListener('change', e => {
+            if (e.target.checked) {
+                finishedTodo(check);
+            } else {
+                unfinishedTodo(check)
+            }
+        })
+        // https://stackoverflow.com/questions/14544104/checkbox-check-event-listener
+
     })
 
-    // check.addEventListener('checked', () => {
-
-    // })
 }
 
 // Lägga till todos 
@@ -80,7 +87,7 @@ todoForm.addEventListener('submit', e => {
 })
 
 const createTodo = async() => {
-    const todo = {
+    const newTodo = {
         title: todoTitle
     }
 
@@ -90,7 +97,7 @@ const createTodo = async() => {
             headers: {
                 'Content-type': 'application/json'
             },
-            body: JSON.stringify(todo)
+            body: JSON.stringify(newTodo)
         })
     
         if(response.status !== 201){
@@ -139,17 +146,17 @@ removeTodoBtn.addEventListener('click', () => {
 })
 
 const removeTodo = async(todo) => {
-    const todoId = todo._id
-    console.log(todoId)
-    const todoUrl = `https://js1-todo-api.vercel.app/api/todos/${todoId}?apikey=6e308da8-8ca1-488a-99f5-fc410760a050`
+    const removeTodoId = todo._id
+    console.log(removeTodoId)
+    const removeTodoUrl = `https://js1-todo-api.vercel.app/api/todos/${removeTodoId}?apikey=6e308da8-8ca1-488a-99f5-fc410760a050`
 
     try {
-        let response = await fetch(todoUrl, {
+        let response = await fetch(removeTodoUrl, {
             method: 'DELETE',
             headers: {
                 'Content-type': 'application/json'
             },
-            body: JSON.stringify(todoId)
+            body: JSON.stringify(removeTodoId)
         })
     
         if(response.status !== 200){
@@ -182,58 +189,64 @@ const removeTodo = async(todo) => {
 // Förhindra användare från att ta bort todos som inte är klarmarkerade. 
 // Om användaren ändå försöker ta bort en sådan todo ska en modal (popup) visas istället med en text som förklarar varför borttagningen inte är tillåten. 
 // Denna får inte vara en vanlig alert()
+const finishedTodo = async (check) => {
+    const finishedTodoId = check.id
+    console.log(finishedTodoId)
+    const finishedTodoUrl = `https://js1-todo-api.vercel.app/api/todos/${finishedTodoId}?apikey=6e308da8-8ca1-488a-99f5-fc410760a050`
 
+    const finishedTodo = {
+        completed: true
+    }
 
-// const updateFirstTodo = async () => {
-//     const todo2 = {
-//         completed: true
-//     }
+    try {
+        const response = await fetch(finishedTodoUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(finishedTodo)
+        })
+    
+        if(response.status !== 200){
+            throw new Error ('Ett fel uppstod');
+        }
+    
+        const data = await response.json();
+        console.log('Todo updated successfully:', data);  
+        return data;
+    
+    } catch (error) {
+        console.error(error.message)
+    }
+}
 
-//     try {
-//         const response = await fetch(url2, {
-//             method: 'PUT',
-//             headers: {
-//                 'Content-type': 'application/json'
-//             },
-//             body: JSON.stringify(todo2)
-//         })
-    
-//         if(response.status !== 200){
-//             throw new Error ('Ett fel uppstod');
-//         }
-    
-//         const data = await response.json();
-//         console.log('Todo updated successfully:', data);  
-//         return data;
-    
-//     } catch (error) {
-//         console.error(error.message)
-//     }
-// }
+const unfinishedTodo = async (check) => {
+    const unfinishedTodoId = check.id
+    console.log(unfinishedTodoId)
+    const unfinishedTodoUrl = `https://js1-todo-api.vercel.app/api/todos/${unfinishedTodoId}?apikey=6e308da8-8ca1-488a-99f5-fc410760a050`
 
-// updateFirstTodo();
+    const unfinishedTodo = {
+        completed: false
+    }
 
-// const deleteLastTodo = async () => {
-//     try {
-//         const response = await fetch(url3, {
-//             method: 'DELETE',
-//             headers: {
-//                 'Content-type': 'application/json'
-//             },
-//             body: JSON.stringify(id3)
-//         })
+    try {
+        const response = await fetch(unfinishedTodoUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(unfinishedTodo)
+        })
     
-//         if(response.status !== 200){
-//             throw new Error ('Ett fel uppstod');
-//         }
+        if(response.status !== 200){
+            throw new Error ('Ett fel uppstod');
+        }
     
-//         const data = await response.json();
-//         console.log('Todo deleted successfully:', data);  
-//         return data;
+        const data = await response.json();
+        console.log('Todo updated successfully:', data);  
+        return data;
     
-//     } catch (error) {
-//         console.error(error.message)
-//     }
-// }
-
-// deleteLastTodo();
+    } catch (error) {
+        console.error(error.message)
+    }
+}
