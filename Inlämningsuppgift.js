@@ -6,9 +6,17 @@ const todos = [];
 
 const url = 'https://js1-todo-api.vercel.app/api/todos?apikey=6e308da8-8ca1-488a-99f5-fc410760a050'
 const todoForm = document.querySelector('#todoForm');
+const createTodoField = document.querySelector('#createTodo')
+const removeTodoField = document.querySelector('#removeTodo')
+
 let todoList = document.querySelector('#todoList');
+
+const modal = document.querySelector('#modal');
+const closeModalBtn = document.querySelector('#closeModal');
+
 let todoTitle;
 let removeTodoTitle;
+let errorMessage;
 let isCompleted = false;
 
 const getTodos = async () => {
@@ -22,8 +30,6 @@ const getTodos = async () => {
     data.forEach(todo => todos.push(todo))
 
     showTodos()
-    console.log(todos)
-    console.log(data)
 
     return true;
 }
@@ -49,24 +55,27 @@ const showTodos = () => {
             li.style.backgroundColor = 'red';
         }
 
-        todoList.append(li, check)
+        li.appendChild(check)
+        todoList.appendChild(li)
 
         check.addEventListener('change', e => {
             if (e.target.checked) {
                 isCompleted = true
                 li.style.backgroundColor = 'green';
+                li.style.textDecoration = 'line-through';
                 finishedTodo(check);
             } else {
                 isCompleted = false
                 li.style.backgroundColor = 'red';
+                li.style.textDecoration = 'none';
                 unfinishedTodo(check)
             }
         })
         // https://stackoverflow.com/questions/14544104/checkbox-check-event-listener
-
     })
 
 }
+// Kod tagen från/inspirerad från (Youtube-länk)
 
 // Lägga till todos 
 // Skapa ett formulär med en textinput och en knapp, som låter användaren lägga till en ny Todo. 
@@ -77,22 +86,29 @@ const showTodos = () => {
 // Uppdatera listan på hemsidan med den nya todon efter att du har fått ett svar från API:et.
 todoForm.addEventListener('submit', e => {
     e.preventDefault();
-
     todoTitle = document.querySelector('#createTodo').value;
-    let isTitleAvaliable = true
 
-    if(todoTitle === ''){
-        console.log('Not allowed to submit an empty todo');
-        return;
-    }
+    console.log(createTodoField)
+    console.log(typeof createTodoField)
+    console.log(createTodoField.parentElement)
+
+    let isTitleAvaliable = true
 
     todos.filter(todo => {
         if(todo.title === todoTitle){
             isTitleAvaliable = false
-            console.log('Please enter a todo title that does not already exist')
+            validateInput(createTodoField, isTitleAvaliable)
             return;
         } 
     })
+
+    if(!validateInput(createTodoField, isTitleAvaliable)){
+        console.log(validateInput(createTodoField, isTitleAvaliable))
+        isTitleAvaliable = false
+        return
+    }
+
+    console.log(isTitleAvaliable)
 
     if (isTitleAvaliable) {
         createTodo()
@@ -120,7 +136,6 @@ const createTodo = async() => {
         }
 
         window.location.reload()
-        // skriva = "" istället för att ladda om sidan?
         // https://medium.com/@johnwadelinatoc/manipulating-the-dom-with-fetch-7bfddf9c526b
 
     } catch (error) {
@@ -140,17 +155,11 @@ removeTodoBtn.addEventListener('click', () => {
     removeTodoTitle = document.querySelector('#removeTodo').value;
     let isTodo = false;
 
-    if(removeTodoTitle === ''){
-        console.log('Please enter a todo title');
-        return;
-    }
-
     todos.filter(todo => {
         if(todo.title === removeTodoTitle){
             if (!isCompleted) {
                 isTodo = true
-                showModule()
-                console.log('Unable to remove an unfinished Todo')
+                showModal()
                 return
             } else {
                 isTodo = true
@@ -162,14 +171,28 @@ removeTodoBtn.addEventListener('click', () => {
     })
 
     if (!isTodo) {
-        console.log("Couldn't find a matching todo")
+        validateInput(removeTodoField, isTodo)
+        return
     }
-   
 })
+
+const showModal = () => {
+    modal.style.display = "block";
+}
+
+closeModalBtn.onclick = () => {
+    modal.style.display = "none";
+}
+
+window.onclick = (event) => {
+    if(event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+// https://www.w3schools.com/howto/howto_css_modals.asp
 
 const removeTodo = async(todo) => {
     const removeTodoId = todo._id
-    console.log(removeTodoId)
     const removeTodoUrl = `https://js1-todo-api.vercel.app/api/todos/${removeTodoId}?apikey=6e308da8-8ca1-488a-99f5-fc410760a050`
 
     try {
@@ -212,7 +235,6 @@ const removeTodo = async(todo) => {
 // Denna får inte vara en vanlig alert()
 const finishedTodo = async (check) => {
     const finishedTodoId = check.id
-    console.log(finishedTodoId)
     const finishedTodoUrl = `https://js1-todo-api.vercel.app/api/todos/${finishedTodoId}?apikey=6e308da8-8ca1-488a-99f5-fc410760a050`
 
     const finishedTodo = {
@@ -233,7 +255,6 @@ const finishedTodo = async (check) => {
         }
     
         const data = await response.json();
-        console.log('Todo updated successfully:', data);  
         return data;
     
     } catch (error) {
@@ -245,7 +266,6 @@ const finishedTodo = async (check) => {
 
 const unfinishedTodo = async (check) => {
     const unfinishedTodoId = check.id
-    console.log(unfinishedTodoId)
     const unfinishedTodoUrl = `https://js1-todo-api.vercel.app/api/todos/${unfinishedTodoId}?apikey=6e308da8-8ca1-488a-99f5-fc410760a050`
 
     const unfinishedTodo = {
@@ -266,12 +286,41 @@ const unfinishedTodo = async (check) => {
         }
     
         const data = await response.json();
-        console.log('Todo updated successfully:', data);  
         return data;
     
     } catch (error) {
         console.error(error.message)
     }
-
+    
     return true;
 }
+
+const validateInput = (inputField, todoBoolean) => {
+    console.log(inputField.value)
+    console.log(todoBoolean)
+
+    if(inputField.value === ''){
+        console.log(inputField.parentElement)
+        showErrorMessage(inputField, "Please enter a Todo title")
+        return false
+    } else if (!todoBoolean) {
+        if(inputField === createTodoField) {
+            showErrorMessage(createTodoField, "Please enter a Todo title that does not already exist")
+            return false
+        } else if (inputField === removeTodoField) {
+            showErrorMessage(removeTodoField, "Couldn't find a matching Todo")
+            return false
+        } 
+    }
+    return true
+}
+
+const showErrorMessage = (inputField, errorText) => {
+    const parent = inputField.parentElement
+    const errorElement = parent.querySelector('.errorMessage')
+
+    errorElement.innerText = errorText
+    errorElement.style.color = "red";
+    return
+}
+// https://www.youtube.com/watch?v=ccC7K-AwvfA

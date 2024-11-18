@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Todo-list</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div>
@@ -13,21 +14,24 @@
                 <input type="text" id="createTodo">
             
                 <button type="submit" id="submitTodo">Send</button>
+                <p class="errorMessage"></p>
             </div>
             <div>
                 <label for="removeTodo">Remove a Todo from the list</label>
                 <input type="text" id="removeTodo">
 
                 <button type="button" id="removeTodoBtn">Remove</button>
+                <p class="errorMessage"></p>
             </div>
         </form>
     </div>
     
     <ul id="todoList"></ul>
 
-    <div class="modal">
-        <div class="modal-content">
+    <div id="modal">
+        <div id="modal-content">
             <p>Sorry, you cannot remove an unfinished Todo</p>
+            <button type="button" id="closeModal">Close</button>
         </div>
     </div>
 
