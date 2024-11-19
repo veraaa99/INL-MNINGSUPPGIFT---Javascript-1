@@ -4,37 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo-list</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div>
-        <form id="todoForm">
-            <div>
-                <label for="createTodo">Add a new Todo to the list</label>
-                <input type="text" id="createTodo">
-            
-                <button type="submit" id="submitTodo">Send</button>
-                <p class="errorMessage"></p>
-            </div>
-            <div>
-                <label for="removeTodo">Remove a Todo from the list</label>
-                <input type="text" id="removeTodo">
-
-                <button type="button" id="removeTodoBtn">Remove</button>
-                <p class="errorMessage"></p>
-            </div>
-        </form>
-    </div>
+    <section class="m-3 p-4 border border-2 border-info rounded-top">
+        <div class="container">
+            <form id="todoForm">
+                <div>
+                    <h1 class="text-center mt-3 mb-5">Create your own Todo-list</h1>
+                </div>
+                <div>
+                        <label for="createTodo" class="form-label">Add a new Todo to the list</label>
+                        <input type="text" id="createTodo" class="form-control">
+                        <button type="submit" id="submitTodo" class="btn btn-outline-primary mt-2">Send</button>
+                        <p class="errorMessage"></p>
+                </div>
+                <div>
+                    <label for="removeTodo" class="form-label">Remove a Todo from the list</label>
+                    <input type="text" id="removeTodo" class="form-control">
     
-    <ul id="todoList"></ul>
-
-    <div id="modal">
-        <div id="modal-content">
-            <p>Sorry, you cannot remove an unfinished Todo</p>
-            <button type="button" id="closeModal">Close</button>
+                    <button type="button" id="removeTodoBtn" class="btn btn-outline-primary mt-2">Remove</button>
+                    <p class="errorMessage"></p>
+                </div>
+            </form>
         </div>
-    </div>
+        <div class="container">
+            <h2>List with Todos</h2>
+            <ul id="todoList" class="list-group"></ul>
+        </div>
+    
+        <div id="myModal" class="modal fade">
+            <div class="modal-dialog">
+                <div id="modal-content" class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Modal Header</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Sorry, you cannot remove an unfinished Todo</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="closeModal" class="btn btn-default">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <script src="Inlämningsuppgift.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/Inlämningsuppgift.js"></script>
 </body>
 </html>

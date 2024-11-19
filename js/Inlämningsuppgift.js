@@ -11,7 +11,12 @@ const removeTodoField = document.querySelector('#removeTodo')
 
 let todoList = document.querySelector('#todoList');
 
-const modal = document.querySelector('#modal');
+const myModal = new bootstrap.Modal(document.querySelector('#myModal'), {
+     keyboard: false
+    });
+// https://getbootstrap.com/docs/5.3/components/modal/#how-it-works
+// https://www.w3schools.com/bootstrap/bootstrap_modal.asp
+
 const closeModalBtn = document.querySelector('#closeModal');
 
 let todoTitle;
@@ -21,14 +26,10 @@ let isCompleted = false;
 
 const getTodos = async () => {
     const response = await fetch (url)
-
-    if(response.status !== 200){
-        throw new Error ('Ett fel uppstod');
-    }
+    checkResponse(response);
 
     const data = await response.json()
     data.forEach(todo => todos.push(todo))
-
     showTodos()
 
     return true;
@@ -41,33 +42,40 @@ const showTodos = () => {
         let li = document.createElement("li")
         li.innerText = todo.title
         li.id = todo._id
+        li.className = 'list-group-item d-flex justify-content-between'
 
         let check = document.createElement("input")
         check.type = "checkbox"
         check.id = todo._id
+        check.className = 'form-check-input'
 
         if (todo.completed) {
             isCompleted = true
             check.checked = true
-            li.style.backgroundColor = 'green';
+            li.classList.add('bg-success', 'text-decoration-line-through')
+            li.classList.remove('bg-danger', 'text-decoration-none')
         } else {
             isCompleted = false
-            li.style.backgroundColor = 'red';
+            li.classList.add('bg-danger')
+            li.classList.remove('bg-success', 'text-decoration-line-through')
         }
 
         li.appendChild(check)
         todoList.appendChild(li)
+        // Kod tagen från/inspirerad från (Youtube-länk)
 
         check.addEventListener('change', e => {
             if (e.target.checked) {
                 isCompleted = true
-                li.style.backgroundColor = 'green';
-                li.style.textDecoration = 'line-through';
+                li.classList.add('bg-success', 'text-decoration-line-through')
+                li.classList.remove('bg-danger', 'text-decoration-none')
+
                 finishedTodo(check);
             } else {
                 isCompleted = false
-                li.style.backgroundColor = 'red';
-                li.style.textDecoration = 'none';
+                li.classList.add('bg-danger', 'text-decoration-none')
+                li.classList.remove('bg-success', 'text-decoration-line-through')
+
                 unfinishedTodo(check)
             }
         })
@@ -75,7 +83,6 @@ const showTodos = () => {
     })
 
 }
-// Kod tagen från/inspirerad från (Youtube-länk)
 
 // Lägga till todos 
 // Skapa ett formulär med en textinput och en knapp, som låter användaren lägga till en ny Todo. 
@@ -98,17 +105,13 @@ todoForm.addEventListener('submit', e => {
         if(todo.title === todoTitle){
             isTitleAvaliable = false
             validateInput(createTodoField, isTitleAvaliable)
-            return;
         } 
     })
+    //youtube-länk
 
     if(!validateInput(createTodoField, isTitleAvaliable)){
-        console.log(validateInput(createTodoField, isTitleAvaliable))
         isTitleAvaliable = false
-        return
     }
-
-    console.log(isTitleAvaliable)
 
     if (isTitleAvaliable) {
         createTodo()
@@ -130,11 +133,9 @@ const createTodo = async() => {
             },
             body: JSON.stringify(newTodo)
         })
-    
-        if(response.status !== 201){
-            throw new Error ('Ett fel uppstod');
-        }
 
+        checkResponse(response);
+    
         window.location.reload()
         // https://medium.com/@johnwadelinatoc/manipulating-the-dom-with-fetch-7bfddf9c526b
 
@@ -142,7 +143,7 @@ const createTodo = async() => {
         console.error(error.message)
     }
 
-    return true;
+    return;
 }
 
 // Ta bort todo 
@@ -177,19 +178,20 @@ removeTodoBtn.addEventListener('click', () => {
 })
 
 const showModal = () => {
-    modal.style.display = "block";
+    myModal.show()
 }
 
 closeModalBtn.onclick = () => {
-    modal.style.display = "none";
+    myModal.hide()
 }
 
 window.onclick = (event) => {
-    if(event.target == modal) {
-        modal.style.display = "none";
+    if(event.target == myModal) {
+        myModal.hide()
     }
 }
 // https://www.w3schools.com/howto/howto_css_modals.asp
+// https://www.geeksforgeeks.org/how-to-trigger-a-modal-using-javascript-in-bootstrap/
 
 const removeTodo = async(todo) => {
     const removeTodoId = todo._id
@@ -203,10 +205,8 @@ const removeTodo = async(todo) => {
             },
             body: JSON.stringify(removeTodoId)
         })
-    
-        if(response.status !== 200){
-            throw new Error ('Ett fel uppstod');
-        }
+
+        checkResponse(response);
     
         response = await response.json();
 
@@ -249,10 +249,8 @@ const finishedTodo = async (check) => {
             },
             body: JSON.stringify(finishedTodo)
         })
-    
-        if(response.status !== 200){
-            throw new Error ('Ett fel uppstod');
-        }
+
+        checkResponse(response);
     
         const data = await response.json();
         return data;
@@ -280,10 +278,8 @@ const unfinishedTodo = async (check) => {
             },
             body: JSON.stringify(unfinishedTodo)
         })
-    
-        if(response.status !== 200){
-            throw new Error ('Ett fel uppstod');
-        }
+
+        checkResponse(response);
     
         const data = await response.json();
         return data;
@@ -296,9 +292,6 @@ const unfinishedTodo = async (check) => {
 }
 
 const validateInput = (inputField, todoBoolean) => {
-    console.log(inputField.value)
-    console.log(todoBoolean)
-
     if(inputField.value === ''){
         console.log(inputField.parentElement)
         showErrorMessage(inputField, "Please enter a Todo title")
@@ -319,8 +312,21 @@ const showErrorMessage = (inputField, errorText) => {
     const parent = inputField.parentElement
     const errorElement = parent.querySelector('.errorMessage')
 
+    inputField.className = 'form-control border border-danger'
     errorElement.innerText = errorText
-    errorElement.style.color = "red";
+    errorElement.className = 'errorMessage text-danger'
     return
 }
 // https://www.youtube.com/watch?v=ccC7K-AwvfA
+
+const checkResponse = async (response) => {
+    switch(response.status) {
+        case 200: 
+            break
+        case 201:
+            break
+        default:
+            throw new Error ('Ett fel uppstod');
+    }
+    //skriva return ist?
+}
