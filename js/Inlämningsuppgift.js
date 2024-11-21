@@ -5,20 +5,19 @@ const todos = [];
 
 const url = 'https://js1-todo-api.vercel.app/api/todos?apikey=6e308da8-8ca1-488a-99f5-fc410760a050'
 const todoForm = document.querySelector('#todoForm');
-const createTodoField = document.querySelector('#createTodo')
-const removeTodoField = document.querySelector('#removeTodo')
-let todoList = document.querySelector('#todoList');
 
-/*
-* Code taken from/inspired by: https://getbootstrap.com/docs/5.3/components/modal/#how-it-works 
-*/
-const myModal = new bootstrap.Modal(document.querySelector('#myModal'), {
-     keyboard: false
-})
-const closeModalBtn = document.querySelector('#closeModal');
-
+const submitTodoInput = document.querySelector('#submitTodoInput')
+const submitTodoBtn = document.querySelector('#submitTodoBtn')
+const removeTodoInput = document.querySelector('#removeTodoInput')
+const removeTodoBtn = document.querySelector('#removeTodoBtn')
 let todoTitle;
 let removeTodoTitle;
+let todoList = document.querySelector('#todoList');
+const debugRemoveTodoBtn = document.querySelector('#debugBtn'); //REMOVE
+
+const myModal = document.getElementById('myModal')
+const closeModalBtn = document.querySelector('#closeModal');
+
 let errorMessage;
 let isCompleted = false;
 
@@ -68,7 +67,7 @@ const showTodos = () => {
             li.classList.remove('bg-danger', 'text-decoration-none')
         } else {
             isCompleted = false
-            li.classList.add('bg-danger')
+            li.classList.add('bg-danger', 'text-light')
             li.classList.remove('bg-success', 'text-decoration-line-through')
         }
 
@@ -104,34 +103,34 @@ const showTodos = () => {
  */
 todoForm.addEventListener('submit', e => {
     e.preventDefault();
-    todoTitle = document.querySelector('#createTodo').value;
+    todoTitle = submitTodoInput.value;
 
     let isTitleAvaliable = true
 
     // Use of filter function inspired by: https://www.youtube.com/watch?v=XPX8IT_aW2Q&t=1222s , timestamp: 21:27-23:35
     todos.filter(todo => {
-        if(todo.title === todoTitle){
+        if(todo.title.trim() === todoTitle.trim()){
             isTitleAvaliable = false
-            validateInput(createTodoField, isTitleAvaliable)
+            validateInput(submitTodoInput, isTitleAvaliable)
         } 
     })
 
-    if(!validateInput(createTodoField, isTitleAvaliable)){
+    if(!validateInput(submitTodoInput, isTitleAvaliable)){
         isTitleAvaliable = false
     }
 
     if (isTitleAvaliable) {
-        createTodo()
+        submitTodo()
         return
     }
 
 })
 
 /*
- * Post user's todo to database
+ * Create and submit user's todo to database
  * Code taken from/inspired by: https://www.youtube.com/watch?v=5ULBPRuyKfc&t=4975s , timestamp 2:35:14-2:37:35
  */
-const createTodo = async() => {
+const submitTodo = async() => {
     const newTodo = {
         title: todoTitle
     }
@@ -157,6 +156,18 @@ const createTodo = async() => {
 }
 
 /*
+ * Triggers the submit-button if the user presses the 'Enter' key while being in the 'submit todo'-input field
+ * Code taken from/inspired by: https://www.w3schools.com/howto/howto_js_trigger_button_enter.asp 
+ */
+submitTodoInput.addEventListener("keypress", (e) => {
+    if(e.key == "Enter"){
+        e.preventDefault();
+        submitTodoBtn.click()
+    }
+})
+
+
+/*
 * REMOVE TODO
 */
 
@@ -165,12 +176,12 @@ const createTodo = async() => {
  * If the Todo title exists in the database, call the removeTodo() function.
  */
 removeTodoBtn.addEventListener('click', () => {
-    removeTodoTitle = document.querySelector('#removeTodo').value;
+    removeTodoTitle = document.querySelector('#removeTodoInput').value;
     let isTodo = false;
 
     // Use of filter function inspired by: https://www.youtube.com/watch?v=XPX8IT_aW2Q&t=1222s , timestamp: 21:27-23:35
     todos.filter(todo => {
-        if(todo.title === removeTodoTitle){
+        if(todo.title.trim() === removeTodoTitle.trim()){
             if (!isCompleted) {
                 isTodo = true
                 showModal()
@@ -185,7 +196,7 @@ removeTodoBtn.addEventListener('click', () => {
     })
 
     if (!isTodo) {
-        validateInput(removeTodoField, isTodo)
+        validateInput(removeTodoInput, isTodo)
         return
     }
 })
@@ -220,6 +231,17 @@ const removeTodo = async(todo) => {
 
     return true
 }
+
+/*
+ * Triggers the remove-button if the user presses the 'Enter' key while being in the 'remove todo'-input field
+ * Code taken from/inspired by: https://www.w3schools.com/howto/howto_js_trigger_button_enter.asp 
+ */
+removeTodoInput.addEventListener("keypress", (e) => {
+    if(e.key == "Enter"){
+        e.preventDefault();
+        removeTodoBtn.click();
+    }
+})
 
 /*
 * UPDATE TODO
@@ -297,22 +319,23 @@ const unfinishedTodo = async (check) => {
 
 /*
  * Show & close a modal with an error message. The modal appears if the user tries to remove an unfinished Todo
- * Code taken from/inspired by: https://www.w3schools.com/howto/howto_css_modals.asp & https://www.geeksforgeeks.org/how-to-trigger-a-modal-using-javascript-in-bootstrap/
+ * Code taken from/inspired by: https://www.w3schools.com/howto/howto_css_modals.asp
  */
 //Show modal
 const showModal = () => {
-    myModal.show()
+    myModal.style.display ="block";
+    closeModalBtn.focus();
 }
 
 // Close modal (if the user presses the 'close'-button in the modal)
 closeModalBtn.onclick = () => {
-    myModal.hide()
+    myModal.style.display = "none";
 }
 
-//Close modal (if the user clicks anywhere outside of the modal)
+// //Close modal (if the user clicks anywhere outside of the modal)
 window.onclick = (event) => {
     if(event.target == myModal) {
-        myModal.hide()
+        myModal.style.display = "none";
     }
 }
 
@@ -325,16 +348,15 @@ window.onclick = (event) => {
  * Code taken from/inspired by: https://www.youtube.com/watch?v=ccC7K-AwvfA&t=4128s , timestamp 26:27-36:17
  */
  const validateInput = (inputField, todoBoolean) => {
-    if(inputField.value === ''){
-        console.log(inputField.parentElement)
+    if(inputField.value.trim() === ''){
         showErrorMessage(inputField, "Please enter a Todo title")
         return false
     } else if (!todoBoolean) {
-        if(inputField === createTodoField) {
-            showErrorMessage(createTodoField, "Please enter a Todo title that does not already exist")
+        if(inputField === submitTodoInput) {
+            showErrorMessage(submitTodoInput, "Please enter a Todo title that does not already exist")
             return false
-        } else if (inputField === removeTodoField) {
-            showErrorMessage(removeTodoField, "Couldn't find a matching Todo")
+        } else if (inputField === removeTodoInput) {
+            showErrorMessage(removeTodoInput, "Couldn't find a matching Todo")
             return false
         } 
     }

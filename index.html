@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,22 +8,21 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <section class="m-3 p-4 border border-2 border-info rounded-top">
+    <section class="m-3 p-4 border border-2 border-primary rounded-top">
         <div class="container">
             <form id="todoForm">
                 <div>
                     <h1 class="text-center mt-3 mb-5">Create your own Todo-list</h1>
                 </div>
                 <div>
-                        <label for="createTodo" class="form-label">Add a new Todo to the list</label>
-                        <input type="text" id="createTodo" class="form-control">
-                        <button type="submit" id="submitTodo" class="btn btn-outline-primary mt-2">Send</button>
-                        <p class="errorMessage"></p>
+                    <label for="submitTodoInput" class="form-label">Add a new Todo to the list</label>
+                    <input type="text" id="submitTodoInput" class="form-control">
+                    <button type="submit" id="submitTodoBtn" class="btn btn-outline-primary mt-2">Send</button>
+                    <p class="errorMessage"></p>
                 </div>
                 <div>
-                    <label for="removeTodo" class="form-label">Remove a Todo from the list</label>
-                    <input type="text" id="removeTodo" class="form-control">
-    
+                    <label for="removeTodoInput" class="form-label">Remove a Todo from the list</label>
+                    <input type="text" id="removeTodoInput" class="form-control">
                     <button type="button" id="removeTodoBtn" class="btn btn-outline-primary mt-2">Remove</button>
                     <p class="errorMessage"></p>
                 </div>
@@ -35,17 +34,18 @@
         </div>
     
         <!-- Code for the Modal structure taken from/inspired by: https://www.w3schools.com/bootstrap/bootstrap_modal.asp --> 
-        <div id="myModal" class="modal fade">
+        <div id="myModal" class="modal" aria-labelledby="exampleModalLabel">
             <div class="modal-dialog">
-                <div id="modal-content" class="modal-content">
+                <div id="modal-content" class="modal-content text-bg-dark">
                     <div class="modal-header">
-                        <h4 class="modal-title">Modal Header</h4>
+                        <h4 class="modal-title">Todo removal failed</h4>
                     </div>
                     <div class="modal-body">
-                        <p>Sorry, you cannot remove an unfinished Todo</p>
+                        <p>Sorry, you cannot remove a Todo that's not finished yet.</p>
+                        <p>Please check the Todo's matching checkbox and try again.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="closeModal" class="btn btn-default">Close</button>
+                        <button type="button" id="closeModal" class="btn btn-outline-primary">Close</button>
                     </div>
                 </div>
             </div>
