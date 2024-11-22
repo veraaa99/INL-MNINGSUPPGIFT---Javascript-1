@@ -1,8 +1,6 @@
 /*
 * VARIABLES 
 */
-const todos = [];
-
 const url = 'https://js1-todo-api.vercel.app/api/todos?apikey=6e308da8-8ca1-488a-99f5-fc410760a050'
 const todoForm = document.querySelector('#todoForm');
 
@@ -10,16 +8,16 @@ const submitTodoInput = document.querySelector('#submitTodoInput')
 const submitTodoBtn = document.querySelector('#submitTodoBtn')
 const removeTodoInput = document.querySelector('#removeTodoInput')
 const removeTodoBtn = document.querySelector('#removeTodoBtn')
+let errorMessage;
 let todoTitle;
 let removeTodoTitle;
 let todoList = document.querySelector('#todoList');
-const debugRemoveTodoBtn = document.querySelector('#debugBtn'); //REMOVE
 
 const myModal = document.getElementById('myModal')
 const closeModalBtn = document.querySelector('#closeModal');
 
-let errorMessage;
-let isCompleted = false;
+// Todo-array containing the titles of all todos
+const todos = [];
 
 /*
 * FETCH/SHOW TODOS 
@@ -32,9 +30,9 @@ let isCompleted = false;
  */
 const getTodos = async () => {
     const response = await fetch (url)
+    const data = await response.json()
     checkResponse(response);
 
-    const data = await response.json()
     data.forEach(todo => todos.push(todo))
     showTodos()
 
@@ -55,39 +53,37 @@ const showTodos = () => {
         li.id = todo._id
         li.className = 'list-group-item d-flex justify-content-between'
 
-        let check = document.createElement("input")
-        check.type = "checkbox"
-        check.id = todo._id
-        check.className = 'form-check-input'
+        let checkbox = document.createElement("input")
+        checkbox.type = "checkbox"
+        checkbox.id = todo._id
+        checkbox.className = 'form-check-input'
 
         if (todo.completed) {
-            isCompleted = true
-            check.checked = true
+            checkbox.checked = true
             li.classList.add('bg-success', 'text-decoration-line-through')
             li.classList.remove('bg-danger', 'text-decoration-none')
         } else {
-            isCompleted = false
             li.classList.add('bg-danger', 'text-light')
             li.classList.remove('bg-success', 'text-decoration-line-through')
         }
 
-        li.appendChild(check)
+        li.appendChild(checkbox)
         todoList.appendChild(li)
 
         //Event listener for checkbox-code taken from/inspired by user Penguin9 at: https://stackoverflow.com/questions/14544104/checkbox-check-event-listener 
-        check.addEventListener('change', e => {
+        checkbox.addEventListener('change', e => {
             if (e.target.checked) {
-                isCompleted = true
+                todo.completed = true
                 li.classList.add('bg-success', 'text-decoration-line-through')
                 li.classList.remove('bg-danger', 'text-decoration-none')
 
-                finishedTodo(check);
+                finishedTodo(checkbox);
             } else {
-                isCompleted = false
+                todo.completed = false
                 li.classList.add('bg-danger', 'text-decoration-none')
                 li.classList.remove('bg-success', 'text-decoration-line-through')
 
-                unfinishedTodo(check)
+                unfinishedTodo(checkbox)
             }
         })
     })
@@ -103,13 +99,13 @@ const showTodos = () => {
  */
 todoForm.addEventListener('submit', e => {
     e.preventDefault();
-    todoTitle = submitTodoInput.value;
+    todoTitle = submitTodoInput.value.trim();
 
     let isTitleAvaliable = true
 
     // Use of filter function inspired by: https://www.youtube.com/watch?v=XPX8IT_aW2Q&t=1222s , timestamp: 21:27-23:35
     todos.filter(todo => {
-        if(todo.title.trim() === todoTitle.trim()){
+        if(todo.title.trim() === todoTitle){
             isTitleAvaliable = false
             validateInput(submitTodoInput, isTitleAvaliable)
         } 
@@ -145,14 +141,11 @@ const submitTodo = async() => {
         })
 
         checkResponse(response);
-    
         window.location.reload()
 
     } catch (error) {
         console.error(error.message)
     }
-
-    return;
 }
 
 /*
@@ -176,27 +169,26 @@ submitTodoInput.addEventListener("keypress", (e) => {
  * If the Todo title exists in the database, call the removeTodo() function.
  */
 removeTodoBtn.addEventListener('click', () => {
-    removeTodoTitle = document.querySelector('#removeTodoInput').value;
-    let isTodo = false;
+    removeTodoTitle = document.querySelector('#removeTodoInput').value.trim();
+    let doesTodoExist = false;
 
     // Use of filter function inspired by: https://www.youtube.com/watch?v=XPX8IT_aW2Q&t=1222s , timestamp: 21:27-23:35
     todos.filter(todo => {
-        if(todo.title.trim() === removeTodoTitle.trim()){
-            if (!isCompleted) {
-                isTodo = true
+        if(todo.title.trim() === removeTodoTitle){
+            if (!todo.completed) {
+                doesTodoExist = true
                 showModal()
                 return
             } else {
-                isTodo = true
+                doesTodoExist = true
                 removeTodo(todo)
                 return
             }
         } 
-        return
     })
 
-    if (!isTodo) {
-        validateInput(removeTodoInput, isTodo)
+    if (!doesTodoExist) {
+        validateInput(removeTodoInput, doesTodoExist)
         return
     }
 })
@@ -218,9 +210,8 @@ const removeTodo = async(todo) => {
             body: JSON.stringify(removeTodoId)
         })
 
-        checkResponse(response);
-    
         response = await response.json();
+        checkResponse(response);
 
         delete todos[response]
         window.location.reload()
@@ -228,8 +219,6 @@ const removeTodo = async(todo) => {
     } catch (error) {
         console.error(error.message)
     }
-
-    return true
 }
 
 /*
@@ -251,8 +240,8 @@ removeTodoInput.addEventListener("keypress", (e) => {
  * Change a Todo's status to 'completed: true' in the database
  * Code taken from/inspired by: https://www.youtube.com/watch?v=5ULBPRuyKfc&t=4975s , timestamp 2:35:14-2:37:35
  */
-const finishedTodo = async (check) => {
-    const finishedTodoId = check.id
+const finishedTodo = async (checkbox) => {
+    const finishedTodoId = checkbox.id
     const finishedTodoUrl = `https://js1-todo-api.vercel.app/api/todos/${finishedTodoId}?apikey=6e308da8-8ca1-488a-99f5-fc410760a050`
 
     const finishedTodo = {
@@ -269,23 +258,19 @@ const finishedTodo = async (check) => {
         })
 
         checkResponse(response);
-    
-        const data = await response.json();
-        return data;
+        return true;        
     
     } catch (error) {
         console.error(error.message)
     }
-
-    return true;
 }
 
 /*
  * Change a Todo's status to 'completed: false' in the database
  * Code taken from/inspired by: https://www.youtube.com/watch?v=5ULBPRuyKfc&t=4975s , timestamp 2:35:14-2:37:35
  */
-const unfinishedTodo = async (check) => {
-    const unfinishedTodoId = check.id
+const unfinishedTodo = async (checkbox) => {
+    const unfinishedTodoId = checkbox.id
     const unfinishedTodoUrl = `https://js1-todo-api.vercel.app/api/todos/${unfinishedTodoId}?apikey=6e308da8-8ca1-488a-99f5-fc410760a050`
 
     const unfinishedTodo = {
@@ -302,15 +287,12 @@ const unfinishedTodo = async (check) => {
         })
 
         checkResponse(response);
-    
-        const data = await response.json();
-        return data;
+        return true;
     
     } catch (error) {
         console.error(error.message)
     }
     
-    return true;
 }
 
 /*
@@ -387,6 +369,6 @@ const checkResponse = async (response) => {
         case 201:
             break
         default:
-            throw new Error ('Ett fel uppstod');
+            throw new Error ('An error occurred');
     }
 }
