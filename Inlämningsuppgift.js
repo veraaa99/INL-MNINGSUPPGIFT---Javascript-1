@@ -60,11 +60,11 @@ const showTodos = () => {
 
         if (todo.completed) {
             checkbox.checked = true
-            li.classList.add('bg-success', 'text-decoration-line-through')
-            li.classList.remove('bg-danger', 'text-decoration-none')
+            li.classList.add('bg-primary', 'text-decoration-line-through')
+            li.classList.remove('bg-dark', 'text-decoration-none')
         } else {
-            li.classList.add('bg-danger', 'text-light')
-            li.classList.remove('bg-success', 'text-decoration-line-through')
+            li.classList.add('bg-dark', 'text-light')
+            li.classList.remove('bg-primary', 'text-decoration-line-through')
         }
 
         li.appendChild(checkbox)
@@ -74,14 +74,14 @@ const showTodos = () => {
         checkbox.addEventListener('change', e => {
             if (e.target.checked) {
                 todo.completed = true
-                li.classList.add('bg-success', 'text-decoration-line-through')
-                li.classList.remove('bg-danger', 'text-decoration-none')
+                li.classList.add('bg-primary', 'text-decoration-line-through')
+                li.classList.remove('bg-dark', 'text-decoration-none')
 
                 finishedTodo(checkbox);
             } else {
                 todo.completed = false
-                li.classList.add('bg-danger', 'text-decoration-none')
-                li.classList.remove('bg-success', 'text-decoration-line-through')
+                li.classList.add('bg-dark', 'text-decoration-none')
+                li.classList.remove('bg-primary', 'text-decoration-line-through')
 
                 unfinishedTodo(checkbox)
             }
