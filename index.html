@@ -12,16 +12,16 @@
         <div class="container">
             <form id="todoForm">
                 <div>
-                    <h1 class="text-center mt-3 mb-5">Create your own Todo-list</h1>
+                    <h1 class="text-center mt-3 mb-5">Create your own todo-list</h1>
                 </div>
                 <div>
-                    <label for="submitTodoInput" class="form-label">Add a new Todo to the list</label>
+                    <label for="submitTodoInput" class="form-label">Add a new todo to the list</label>
                     <input type="text" id="submitTodoInput" class="form-control">
                     <button type="submit" id="submitTodoBtn" class="btn btn-outline-primary mt-2">Submit</button>
                     <p class="errorMessage"></p>
                 </div>
                 <div>
-                    <label for="removeTodoInput" class="form-label">Remove a Todo from the list</label>
+                    <label for="removeTodoInput" class="form-label">Remove a todo from the list</label>
                     <input type="text" id="removeTodoInput" class="form-control">
                     <button type="button" id="removeTodoBtn" class="btn btn-outline-primary mt-2">Remove</button>
                     <p class="errorMessage"></p>
@@ -29,7 +29,7 @@
             </form>
         </div>
         <div class="container">
-            <h2>List with Todos</h2>
+            <h2>List with todos</h2>
             <ul id="todoList" class="list-group"></ul>
         </div>
     
@@ -41,8 +41,8 @@
                         <h4 class="modal-title">Todo removal failed</h4>
                     </div>
                     <div class="modal-body">
-                        <p>Sorry, you cannot remove a Todo that's not finished yet.</p>
-                        <p>Please check the Todo's matching checkbox and try again.</p>
+                        <p>Cannot remove a todo that is not marked as completed.</p>
+                        <p>Please mark off the todo in the list and try again.</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" id="closeModal" class="btn btn-outline-primary">Close</button>

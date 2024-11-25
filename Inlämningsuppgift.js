@@ -20,7 +20,7 @@ const closeModalBtn = document.querySelector('#closeModal');
 const todos = [];
 
 /*
-* FETCH/SHOW TODOS 
+* GET/SHOW TODOS 
 */
 
 /*
@@ -70,7 +70,7 @@ const showTodos = () => {
         li.appendChild(checkbox)
         todoList.appendChild(li)
 
-        //Event listener for checkbox-code taken from/inspired by user Penguin9 at: https://stackoverflow.com/questions/14544104/checkbox-check-event-listener 
+        //Event listener for checkbox-code taken from/inspired by user SabU at: https://stackoverflow.com/questions/14544104/checkbox-check-event-listener 
         checkbox.addEventListener('change', e => {
             if (e.target.checked) {
                 todo.completed = true
@@ -303,7 +303,7 @@ const unfinishedTodo = async (checkbox) => {
  * Show & close a modal with an error message. The modal appears if the user tries to remove an unfinished Todo
  * Code taken from/inspired by: https://www.w3schools.com/howto/howto_css_modals.asp
  */
-//Show modal
+// Show modal
 const showModal = () => {
     myModal.style.display ="block";
     closeModalBtn.focus();
@@ -331,14 +331,14 @@ window.onclick = (event) => {
  */
  const validateInput = (inputField, todoBoolean) => {
     if(inputField.value.trim() === ''){
-        showErrorMessage(inputField, "Please enter a Todo title")
+        showErrorMessage(inputField, "Please enter a todo title")
         return false
     } else if (!todoBoolean) {
         if(inputField === submitTodoInput) {
-            showErrorMessage(submitTodoInput, "Please enter a Todo title that does not already exist")
+            showErrorMessage(submitTodoInput, "Please enter a todo title that does not already exist")
             return false
         } else if (inputField === removeTodoInput) {
-            showErrorMessage(removeTodoInput, "Couldn't find a matching Todo")
+            showErrorMessage(removeTodoInput, "Couldn't find a matching todo")
             return false
         } 
     }
